@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Easy Tutorials</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Enter city name">
+            <button><img src="https://cdn3.iconfinder.com/data/icons/feather-5/24/search-1024.png"></button>
+        </div>
+        <div class="error" style="display: none;">
+            <p>Invalid city name</p>
+        </div>
+        <div class="weather" style="display: none;">
+            <img src="https://cdn1.iconfinder.com/data/icons/flat-mobile-app-icons/128/weather-1024.png" class="weather-icon">
+            <h1 class="temp">--ºC</h1>
+            <h2 class="city">Loading...</h2>
+            <div class="details">
+                <div class="col" style="display: flex; align-items: center;">
+                    <img src="https://w7.pngwing.com/pngs/676/835/png-transparent-wind-speed-weather-forecasting-wind-text-number-anemometer-thumbnail.png">
+                    <p class="wind">-- km/h</p>
+                    <p>Wind speed</p>
+                </div>
+                <div class="col" style="display: flex; align-items: center;">
+                    <p>Humidity</p>
+                    <p class="humidity">--%</p>
+                    <img src="https://144717348.fs1.hubspotusercontent-eu1.net/hub/144717348/hubfs/Media%20Page/Infographics%20Icon%20Template%20-%20No%20Logo-01.webp?width=500&name=Infographics%20Icon%20Template%20-%20No%20Logo-01.webp">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "2e9d3d5373a5f334bba09eb929939bc9";
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
+
+        async function checkWeather(city) {
+            try {
+                const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+                if (response.status == 404) {
+                    document.querySelector(".error").style.display = "block";
+                    document.querySelector(".weather").style.display = "none";
+                    return;
+                }
+                const data = await response.json();
+                
+                document.querySelector(".city").innerHTML = data.name;
+                document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "ºC";
+                document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+                document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+                
+                if (data.weather[0].main == "Clouds") {
+                    weatherIcon.src = "https://img.freepik.com/premium-vector/3d-button-icon-weather-mobile-app-website-cloudy-weather-forecast-element_313242-1411.jpg?w=360";
+                } else if (data.weather[0].main == "Clear") {
+                    weatherIcon.src = "https://cdn0.iconfinder.com/data/icons/weather-forecast-17/128/forecast-weather_sun-clear-hot-1024.png";
+                } else if (data.weather[0].main == "Rain") {
+                    weatherIcon.src = "https://i.pinimg.com/736x/73/60/fc/7360fcf6fd40842cad410f8d147d1f8b.jpg";
+                } else if (data.weather[0].main == "Drizzle") {
+                    weatherIcon.src = "https://cdn-icons-png.flaticon.com/512/106/106044.png";
+                } else if (data.weather[0].main == "Mist") {
+                    weatherIcon.src = "https://cdn-icons-png.flaticon.com/512/10630/10630000.png";
+                }
+                
+                document.querySelector(".weather").style.display = "block";
+                document.querySelector(".error").style.display = "none";
+            } catch (error) {
+                alert("City not found. Please enter a valid city name.");
+            }
+        }
+        
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+        
+        // Set default city to New York
+        checkWeather("New York");
+    </script>
+</body>
+</html>
